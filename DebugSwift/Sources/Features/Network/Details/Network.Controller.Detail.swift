@@ -742,7 +742,16 @@ extension NetworkViewControllerDetail {
         return formatter.string(fromByteCount: Int64(bytes))
     }
 
-    private func formatLog(model: HttpModel) -> String {
+    private func formatLog(
+        model: HttpModel
+    ) -> String {
+        let curlCommand = """
+            curl -X \(model.method ?? "") \\
+                 -H "\(model.requestHeaderFields?.formattedCurlString() ?? "")" \\
+                 -d "\(model.requestData?.formattedCurlString() ?? "")" \\
+                 \(model.url?.absoluteString ?? "")
+        """
+        
         return """
         [\(model.method ?? "")] \(model.startTime ?? "") (\(model.statusCode ?? ""))
 
@@ -769,6 +778,9 @@ extension NetworkViewControllerDetail {
 
         ------- MIME TYPE -------
         \(model.mineType ?? "No data")
+        
+        ------- cURL -------
+        \(curlCommand)
         """
     }
 }
