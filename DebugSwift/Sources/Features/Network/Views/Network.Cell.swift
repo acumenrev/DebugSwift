@@ -99,11 +99,20 @@ final class NetworkTableViewCell: UITableViewCell {
     }
 
     func setup(_ model: HttpModel) {
-        // Method and basic info
+        if model.requestHeaderFields?.keys.contains("X-APOLLO-OPERATION-TYPE") == true {
+            // graph ql
+            let operationType = model.requestHeaderFields?["X-APOLLO-OPERATION-TYPE"] as? String
+            let operationName = model.requestHeaderFields?["X-APOLLO-OPERATION-NAME"] as? String
+            descriptionLabel.text = "\(formatURL(model.url?.absoluteString)) - GraphQL: type: \(operationType ?? "Unknown"), name: \(operationName ?? "Unknown")"
+        } else {
+            // Method and basic info
+            descriptionLabel.text = formatURL(model.url?.absoluteString)
+        }
         methodLabel.text = "[\(model.method ?? "GET")]"
+        
         numberLabel.text = model.id
         statusCodeLabel.text = model.statusCode
-        descriptionLabel.text = formatURL(model.url?.absoluteString)
+        
         timestampLabel.text = formatTimestamp(model.startTime)
         
         // Performance indicators
